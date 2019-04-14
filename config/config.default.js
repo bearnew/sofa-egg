@@ -16,7 +16,15 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1554822768439_6882';
 
   // add your middleware config here
-  config.middleware = [];
+  config.middleware = ['cors'];
+
+  config.cors = {
+    whiteList: ['*']
+  }
+
+  config.security = {
+    domainWhiteList: ['http://127.0.0.1:23508']
+  }
 
   // port
   config.cluster = {
