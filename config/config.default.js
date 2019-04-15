@@ -35,6 +35,11 @@ module.exports = appInfo => {
     }
   }
 
+  config.jwt = {
+    enable: true,
+    secret: "sofa-egg" //自己设置的值
+  }
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
