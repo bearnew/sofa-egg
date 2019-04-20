@@ -36,8 +36,17 @@ module.exports = appInfo => {
   }
 
   config.jwt = {
-    enable: true,
+    enable: false,
     secret: "sofa-egg" //自己设置的值
+  }
+
+  config.sequelize = {
+    dialect: 'mysql',
+    host: '127.0.0.1',
+    port: 3306,
+    database: 'sofa-egg-database',
+    username: "root",
+    password: "xx123153"
   }
 
   // add your user config here
