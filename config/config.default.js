@@ -22,8 +22,14 @@ module.exports = appInfo => {
     whiteList: ['*']
   }
 
+  // config.security = {
+  //   domainWhiteList: ['http://127.0.0.1:23508']
+  // }
+
   config.security = {
-    domainWhiteList: ['http://127.0.0.1:23508']
+    csrf: {
+      enable: false,
+    }
   }
 
   // port

@@ -10,12 +10,22 @@ module.exports = {
       ENUM
     } = Sequelize;
     await queryInterface.createTable('users', {
-      id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-      openid: STRING(256), // VARCHAR(255)
+      id: {
+        type: INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      openid: {
+        type: STRING(256), // VARCHAR(255)
+        unique: true
+      },
       avatarUrl: STRING(1234), // VARCHAR(255)
       city: STRING(32),
       country: STRING(32),
-      gender: ENUM('male', 'female'),
+      gender: {
+        type: ENUM('male', 'female'),
+        comment: 'male-男， female-女',
+      },
       nickName: STRING(32),
       province: STRING(32),
       created_at: DATE,
