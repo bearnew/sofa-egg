@@ -30,20 +30,22 @@ class HomeController extends Controller {
 			where: {
 				openid
 			}
-		});
+		})
 
+		// 未注册过
 		if (isEmptyObj(role)) {
-			ctx.model.User.create({
+			role = await ctx.model.User.create({
 				openid: openid,
 				gender: gender === 1 ? 'male' : 'female',
 				...userInfo
-			});
+			})
 		}
 
 		const token = await this.service.actionToken.apply({ openid, session_key });
 
 		ctx.status = 201;
 		ctx.body = {
+			userId: role.dataValues.id,
 			token,
 			openid
 		}
