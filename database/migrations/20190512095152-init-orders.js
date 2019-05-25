@@ -17,7 +17,7 @@ module.exports = {
 
     await queryInterface.createTable('orders', {
       id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-      user_id: {
+      userId: {
         type: INTEGER,
         references: {
           model: 'users',

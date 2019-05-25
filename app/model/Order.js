@@ -9,7 +9,7 @@ module.exports = app => {
 
     const Order = app.model.define('order', {
         id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-        user_id: INTEGER,
+        userId: INTEGER,
         likes_count: INTEGER,
         likes_user_ids: STRING,
         created_at: DATE,

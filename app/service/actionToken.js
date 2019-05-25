@@ -11,7 +11,7 @@ class ActionTokenService extends Service {
                     openid: info.openid,
                     session_key: info.session_key
                 },
-                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7天过期
             },
             ctx.app.config.jwt.secret
         );

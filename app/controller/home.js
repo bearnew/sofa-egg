@@ -8,6 +8,7 @@ class HomeController extends Controller {
 		ctx.body = 'hi, egg';
 	}
 
+	// 登录
 	async login() {
 		const { ctx } = this;
 		const {
@@ -26,7 +27,7 @@ class HomeController extends Controller {
 			openid
 		} = result.data;
 
-		const role = await ctx.model.User.findOne({
+		let role = await ctx.model.User.findOne({
 			where: {
 				openid
 			}
@@ -51,66 +52,126 @@ class HomeController extends Controller {
 		}
 	}
 
-	async getUserInfo() {
+	// 根据用户id创建订单
+	async createOrder() {
 		const { ctx } = this;
-		const { openid } = ctx.request.body;
+		const { userId } = ctx.request.body;
 
-		const role = await ctx.model.User.findOne({
+		let msg = '获取订单成功!';
+		let orderData = await ctx.model.Order.findOne({
 			where: {
-				openid
+				userId
 			}
 		});
-		ctx.status = 200;
+
+		if (isEmptyObj(orderData)) {
+			orderData = await ctx.model.Order.create({
+				userId: userId,
+				likes_count: 0,
+				likes_user_ids: '[]'
+			})
+			msg = '创单成功!'
+		}
+
+		ctx.status = 201;
 		ctx.body = {
-			userInfo: role
+			orderId: orderData.id,
+			msg
 		}
 	}
 
+	// 根据orderId获取用户信息
+	async getShareUserInfo() {
+		const { ctx } = this;
+		const { orderId } = ctx.request.body;
+
+		const orderData = await ctx.model.Order.findOne({
+			where: {
+				id: orderId
+			}
+		});
+
+		const role = await ctx.model.User.findOne({
+			where: {
+				id: orderData.userId
+			}
+		});
+
+		ctx.status = 200;
+		ctx.body = {
+			shareUserInfo: role
+		}
+	}
+
+	// 根据orderId获取点赞人的头像
+	async getLikesAvatar() {
+		const { ctx } = this;
+		const { orderId } = ctx.request.body;
+
+		const orderData = await ctx.model.Order.findOne({
+			where: {
+				id: orderId
+			}
+		});
+
+		console.log('22222', orderData.likes_user_ids)
+
+		const users = await ctx.model.User.findAll({
+			where: {
+				id: {
+					in: JSON.parse(orderData.likes_user_ids)
+				}
+			}
+		});
+
+		let avatars = [];
+		if (!isEmptyObj(users)) {
+			avatars = users.reduce((acc, user) => {
+				acc.push(user.avatarUrl);
+				return acc;
+			}, []);
+		}
+
+		ctx.status = 200;
+		ctx.body = {
+			avatars
+		}
+	}
+
+	// 点赞
 	async praise() {
 		const { ctx } = this;
 		const {
-			originalId,
-			openid
+			orderId,
+			userId
 		} = ctx.request.body;
 		let msg = '';
 		let code = 0;
 
-		console.log('6666', JSON.stringify(ctx.request.body))
-		const role = await ctx.model.User.findOne({
-			where: {
-				openid
-			}
-		});
-		console.log('7777', JSON.stringify(role))
-
 		const order = await ctx.model.Order.findOne({
 			where: {
-				user_id: role.id
+				id: orderId
 			}
 		});
-		console.log('888', JSON.stringify(order))
 
-		if (isEmptyObj(order)) {
-			ctx.model.Order.create({
-				user_id: role.id,
-				likes_count: 1,
-				likes_user_ids: JSON.stringify([role.id])
-			});
-			msg = '点赞成功!';
-			code = 0;
+		const likes_user_ids = JSON.parse(order.likes_user_ids);
+
+		if (likes_user_ids.includes(userId)) {
+			msg = '你已经点过赞了!';
+			code = 1;
 		} else {
-			const likes_user_ids = JSON.parse(order.likes_user_ids);
-			likes_user_ids.push(role.id);
+			likes_user_ids.push(userId);
 
 			ctx.model.Order.update({
 				likes_user_ids: JSON.stringify(likes_user_ids)
 			}, {
 					where: {
-						id: order.id
+						id: orderId
 					}
 				})
-			msg = '你已经点过赞了!';
-			code = 1;
+
+			msg = '点赞成功!';
+			code = 0;
 		}
 
 		ctx.status = 200;
